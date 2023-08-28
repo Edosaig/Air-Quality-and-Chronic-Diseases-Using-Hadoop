@@ -8,11 +8,17 @@ This study analysis how pollutants such as Carbon-Monoxide, Ozone, Nitrogen Diox
 
 
 
+
+
 ![image](https://github.com/Edosaig/Air-Quality-and-Chronic-Diseases-Using-Hadoop/assets/107155943/abe6cab4-68aa-46c0-8b0d-3b4fde1ff85c)
 
 
 
+
+
 ![image](https://github.com/Edosaig/Air-Quality-and-Chronic-Diseases-Using-Hadoop/assets/107155943/656a910e-0fba-4103-9691-e63a73701bb2)
+
+
 
 
 
