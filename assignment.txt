@@ -1,0 +1,60 @@
+CREATE TABLE pollution_effect
+STORED AS ORC
+AS
+SELECT c.country, c.year, c.tuberculosis, c.Chronic_Respiratory_Diseases, p.aqi_value, p.co_aqivalue, p.ozone_aqivalue, p.no2_aqivalue, p.pm25_aqivalue
+FROM cause_of_deaths c
+JOIN global_air_pollution_dataset p ON c.country = p.country 
+
+
+%jdbc(hive) 
+SELECT * FROM pollution_effect      # showing created joined table
+
+%spark2
+val hiveContext = new
+org.apache.spark.sql.SparkSession.Builder().getOrCreate()    #initializing spark2
+
+%spark2
+hiveContext.sql("show tables").show()				#showing tables
+
+%spark2
+val pollution_temp = hiveContext.sql("select * from pollution_effect")		#creating temporary table from pollution
+
+%spark2
+pollution_temp.createOrReplaceTempView("pollution_temp")	#     saving & showing temp table
+hiveContext.sql("show tables").show()				
+
+
+%spark2								#creating a table for values above 100 for unhealthy aqi value countries
+val pollution_temp1 = hiveContext.sql("SELECT country, pollution_temp.no2_aqivalue,pollution_temp.co_aqivalue,pollution_temp.ozone_aqivalue, pollution_temp.pm25_aqivalue from pollution_temp where pollution_temp.aqi_value > 100 ")
+
+
+%spark2
+pollution_temp1.createOrReplaceTempView("pollution_temp1")	#saving new table
+hiveContext.sql("show tables").show()
+
+%spark2
+pollution_temp1.show()
+
+
+%sql 
+SELECT * FROM pollution_temp1					#visualizing temp table
+
+%spark2								#creating a table for values below 100 for unhealthy aqi value countries
+val pollution_temp2 = hiveContext.sql("SELECT country, pollution_temp.no2_aqivalue,pollution_temp.co_aqivalue,pollution_temp.ozone_aqivalue, pollution_temp.pm25_aqivalue from pollution_temp where pollution_temp.aqi_value < 100 ")
+
+%spark2
+pollution_temp2.createOrReplaceTempView("pollution_temp2")	#saving new table
+hiveContext.sql("show tables").show()
+
+%sql 								#visualizing new table
+SELECT * FROM pollution_temp2
+
+
+
+
+SELECT * FROM pollution_effect ORDER BY aqi_value ASC;
+SELECT * FROM pollution_effect ORDER BY year DESC;
+SELECT * FROM pollution_effect LIMIT 100;
+SELECT MAX(chronic_respiratory_diseases) FROM pollution_effect;
+ALTER TABLE pollution_effect CHANGE COLUMN aqi_value aqi int
+SELECT SUM(aqi_value), country  FROM pollution_effect as p GROUP BY country;
